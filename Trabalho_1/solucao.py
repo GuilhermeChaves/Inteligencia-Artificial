@@ -121,6 +121,17 @@ def dfs(estado):
         fronteira.extend(expande(nodos[-1]))
 
 
+def h_hamming(estado):
+    objetivo = "12345678_"
+    distancia = 0
+
+    for i, j in zip(estado, objetivo):
+        if i != j:
+            distancia += 1
+
+    return distancia
+
+
 
 def astar_hamming(estado):
     """
@@ -131,8 +142,30 @@ def astar_hamming(estado):
     :param estado: str
     :return:
     """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+    explorados = {}
+    fronteira = list()
+
+    fronteira.append(Nodo(estado, None, None, 0))
+
+    iterations = 0
+    while(True):
+        iterations += 1
+        if(len(fronteira) == 0):
+            return None
+
+        while True:
+            nodo = fronteira.pop(0)
+            if nodo.estado not in explorados:
+                break
+
+        if nodo.estado == "12345678_":
+            return calcula_caminho(nodo)
+
+        if nodo.estado not in explorados:
+            explorados[nodo.estado] = nodo
+            fronteira.extend(expande(nodo))
+            fronteira.sort(key=lambda x: x.custo + h_hamming(x.estado))
+
 
 
 
