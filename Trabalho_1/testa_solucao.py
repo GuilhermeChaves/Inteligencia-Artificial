@@ -1,5 +1,5 @@
 import unittest
-import solucao as solucao
+import solucao
 
 
 class TestaSolucao(unittest.TestCase):
@@ -83,7 +83,7 @@ class TestaSolucao(unittest.TestCase):
         """
         # nao ha solucao a partir do estado 185423_67
         self.assertEqual(None, solucao.dfs("185423_67"))
-    
+
     def test_action_order(self):
         """
         Testa se BFS e A* retornam a sequencia de acoes na ordem correta

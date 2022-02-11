@@ -1,18 +1,14 @@
 import numpy
 
 class Nodo:
-
     def __init__(self, estado, pai, acao, custo):
-
         self.estado = estado
         self.pai = pai
         self.acao = acao
         self.custo = custo
 
 
-
 def sucessor(estado):
-
     l_sucessores = list()
     l_proximo_estado = list(estado)
 
@@ -25,7 +21,7 @@ def sucessor(estado):
         l_sucessores.append(("abaixo", proximo_estado))
         l_proximo_estado = list(estado)             #retorna ao estado inicial
 
-    if(pos >= 3):       
+    if(pos >= 3):
         l_proximo_estado[pos] = l_proximo_estado[pos-3]
         l_proximo_estado[pos-3] = '_'
         proximo_estado = ''.join(l_proximo_estado)
@@ -47,17 +43,16 @@ def sucessor(estado):
 
     return l_sucessores
 
-        
+
 
 def expande(nodo):
-    
     l_sucessores = sucessor(nodo.estado)
 
     size_array = len(l_sucessores)
     array_nodos = numpy.empty(size_array, dtype=Nodo)    # inicializa vetor de nodos
-    
+
     for i in range(size_array):
-        s_acao, s_estado = l_sucessores[i] 
+        s_acao, s_estado = l_sucessores[i]
         array_nodos[i] = Nodo(s_estado , nodo, s_acao, nodo.custo + 1)
 
     return array_nodos
@@ -65,7 +60,6 @@ def expande(nodo):
 
 
 def calcula_caminho(nodo):
-
     caminho = list()
 
     while(nodo.pai != None):
@@ -76,10 +70,9 @@ def calcula_caminho(nodo):
 
     return caminho
 
-    
+
 
 def bfs(estado):
-
     explorados = {}    # explorados["estado"] = Nodo
     fronteira = list()
     nodos = list()
@@ -89,12 +82,12 @@ def bfs(estado):
     while(True):
         if(len(fronteira) == 0):
             return None
-        
+
         nodos.append(fronteira.pop(0))
 
         if(nodos[-1].estado == "12345678_"):
             return calcula_caminho(nodos[-1])
-    
+
         if(explorados.get(nodos[-1].estado)):
             continue
 
@@ -102,10 +95,9 @@ def bfs(estado):
 
         fronteira.extend(expande(nodos[-1]))
 
-                
+
 
 def dfs(estado):
-
     explorados = {}    # explorados["estado"] = Nodo
     fronteira = list()
     nodos = list()
@@ -115,12 +107,12 @@ def dfs(estado):
     while(True):
         if(len(fronteira) == 0):
             return None
-        
+
         nodos.append(fronteira.pop())
 
         if(nodos[-1].estado == "12345678_"):
             return calcula_caminho(nodos[-1])
-    
+
         if(explorados.get(nodos[-1].estado)):
             continue
 
