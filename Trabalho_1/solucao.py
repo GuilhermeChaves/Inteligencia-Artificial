@@ -166,6 +166,54 @@ def astar_hamming(estado):
             fronteira.extend(expande(nodo))
             fronteira.sort(key=lambda x: x.custo + h_hamming(x.estado))
 
+def map_objetivo_manhattan(l_objetivo):
+    l_mapeado = list()
+
+    for str_num in l_objetivo:
+        if(str_num == '_'):
+            x = 2
+            y = 2
+        else:
+            num = int(str_num)
+            x = (num-1) % 3
+            y = int((num - 1)/3)
+        
+        l_mapeado.append((str_num,x,y))
+   
+    return l_mapeado
+
+def get_pos_manhattan(index, str_num):
+    x = index%3
+    y = int(index/3)
+
+    return (str_num,x,y)
+
+
+def h_manhattan(estado):
+    distancia = 0
+
+    l_estado = list(estado)
+    l_objetivo = [('1',0,0), ('2',1,0), ('3',2,0), ('4',0,1), ('5',1,1), ('6',1,2), ('7',0,2), ('8',1,2), ('_',2,2)]
+
+    for index, estado_individual in enumerate(l_estado):
+        estado_mapeado = get_pos_manhattan(index, estado_individual)
+
+        if(estado_mapeado[0] != l_objetivo[index][0]):
+            x_atual = estado_mapeado[1]
+            y_atual = estado_mapeado[2]
+
+            if(estado_mapeado[0] == '_'):
+                index_objetivo = 8
+            else:
+                index_objetivo = int(estado_mapeado[0]) - 1
+            x_objetivo = l_objetivo[index_objetivo][1]        
+            y_objetivo = l_objetivo[index_objetivo][2]
+
+            distancia_individual = abs(x_atual-x_objetivo) + abs(y_atual - y_objetivo)
+            distancia += distancia_individual
+
+    return distancia
+
 
 
 
@@ -178,5 +226,4 @@ def astar_manhattan(estado):
     :param estado: str
     :return:
     """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+    print(h_manhattan(estado))
