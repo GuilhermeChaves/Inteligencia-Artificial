@@ -1,4 +1,5 @@
 import numpy
+import heapq
 
 class Nodo:
     def __init__(self, estado, pai, acao, custo):
@@ -6,6 +7,13 @@ class Nodo:
         self.pai = pai
         self.acao = acao
         self.custo = custo
+        self.custo_astar = 0
+
+
+
+    def __lt__(self, other):
+        return self.custo_astar < other.custo_astar
+
 
 
 def sucessor(estado):
@@ -121,11 +129,14 @@ def dfs(estado):
         fronteira.extend(expande(nodos[-1]))
 
 
+
 def h_hamming(estado):
-    objetivo = "12345678_"
+    l_objetivo = list("12345678_")
+    l_estado = list(estado)
+    l_comparativa = zip(l_estado, l_objetivo)
     distancia = 0
 
-    for i, j in zip(estado, objetivo):
+    for i, j in l_comparativa:
         if i != j:
             distancia += 1
 
@@ -134,59 +145,41 @@ def h_hamming(estado):
 
 
 def astar_hamming(estado):
-    """
-    Recebe um estado (string), executa a busca A* com h(n) = soma das distâncias de Hamming e
-    retorna uma lista de ações que leva do
-    estado recebido até o objetivo ("12345678_").
-    Caso não haja solução a partir do estado recebido, retorna None
-    :param estado: str
-    :return:
-    """
-    explorados = {}
-    fronteira = list()
+    explorados = {}    # explorados["estado"] = Nodo
+    fronteira = []
+    nodos = list()
+    expansao = list()
 
-    fronteira.append(Nodo(estado, None, None, 0))
+    heapq.heappush(fronteira, Nodo(estado, None, None, 0))
 
-    iterations = 0
     while(True):
-        iterations += 1
         if(len(fronteira) == 0):
             return None
 
-        while True:
-            nodo = fronteira.pop(0)
-            if nodo.estado not in explorados:
-                break
+        nodos.append(heapq.heappop(fronteira))
 
-        if nodo.estado == "12345678_":
-            return calcula_caminho(nodo)
+        if(nodos[-1].estado == "12345678_"):
+            return calcula_caminho(nodos[-1])
 
-        if nodo.estado not in explorados:
-            explorados[nodo.estado] = nodo
-            fronteira.extend(expande(nodo))
-            fronteira.sort(key=lambda x: x.custo + h_hamming(x.estado))
+        if(explorados.get(nodos[-1].estado)):
+            continue
 
-def map_objetivo_manhattan(l_objetivo):
-    l_mapeado = list()
+        explorados[nodos[-1].estado] = nodos[-1]
 
-    for str_num in l_objetivo:
-        if(str_num == '_'):
-            x = 2
-            y = 2
-        else:
-            num = int(str_num)
-            x = (num-1) % 3
-            y = int((num - 1)/3)
+        expansao = expande(nodos[-1])
         
-        l_mapeado.append((str_num,x,y))
-   
-    return l_mapeado
+        for nodo in expansao:
+            setattr(nodo, "custo_astar", nodo.custo + h_hamming(nodo.estado))
+            heapq.heappush(fronteira, nodo)
+
+
 
 def get_pos_manhattan(index, str_num):
     x = index%3
     y = int(index/3)
 
     return (str_num,x,y)
+
 
 
 def h_manhattan(estado):
@@ -216,14 +209,31 @@ def h_manhattan(estado):
 
 
 
-
 def astar_manhattan(estado):
-    """
-    Recebe um estado (string), executa a busca A* com h(n) = soma das distâncias de Manhattan e
-    retorna uma lista de ações que leva do
-    estado recebido até o objetivo ("12345678_").
-    Caso não haja solução a partir do estado recebido, retorna None
-    :param estado: str
-    :return:
-    """
-    print(h_manhattan(estado))
+    explorados = {}    # explorados["estado"] = Nodo
+    fronteira = []
+    nodos = list()
+    expansao = list()
+
+    heapq.heappush(fronteira, Nodo(estado, None, None, 0))
+
+    while(True):
+        if(len(fronteira) == 0):
+            return None
+
+        nodos.append(heapq.heappop(fronteira))
+
+        if(nodos[-1].estado == "12345678_"):
+            return calcula_caminho(nodos[-1])
+
+        if(explorados.get(nodos[-1].estado)):
+            continue
+
+        explorados[nodos[-1].estado] = nodos[-1]
+
+        expansao = expande(nodos[-1])
+        
+        for nodo in expansao:
+            setattr(nodo, "custo_astar", nodo.custo + h_manhattan(nodo.estado))
+            heapq.heappush(fronteira, nodo)
+   
