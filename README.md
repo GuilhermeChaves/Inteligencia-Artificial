@@ -7,21 +7,21 @@ As bibliotecas utilizadas são comuns ao ambiente python: numpy e heapq (para o 
 # Resultados
 
 ## Breadth-first Search (BFS)
-Quantidade de nós expandidos: 23
-Custo da solução: 276
+Quantidade de nós expandidos: 104090
+Custo da solução: 23
 Tempo decorrido (s): 1.740
 
 ## Depth-first Search (DFS)
-Quantidade de nós expandidos: 62625
-Custo da solução: 1960976625
+Quantidade de nós expandidos: 175064
+Custo da solução: 62625
 Tempo decorrido (s): 1.279
 
 ## A* com Hamming
-Quantidade de nós expandidos: 23
-Custo da solução: 276
+Quantidade de nós expandidos: 12731
+Custo da solução: 23
 Tempo decorrido (s): 0.134
 
 ## A* com Manhattan
-Quantidade de nós expandidos: 23
-Custo da solução: 276
+Quantidade de nós expandidos: 2736
+Custo da solução: 23
 Tempo decorrido (s): 0.049
