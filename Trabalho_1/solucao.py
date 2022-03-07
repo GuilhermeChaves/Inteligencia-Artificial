@@ -119,6 +119,8 @@ def dfs(estado):
         nodos.append(fronteira.pop())
 
         if(nodos[-1].estado == "12345678_"):
+            print(nodos[-1].custo)
+            print(len(explorados))
             return calcula_caminho(nodos[-1])
 
         if(explorados.get(nodos[-1].estado)):
