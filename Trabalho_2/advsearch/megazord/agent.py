@@ -57,7 +57,7 @@ def valor_max(nodo, color, minha_cor, alpha_, beta_):
         v = max(v, valor_min(nodos_filhos[-1], prox_cor, minha_cor, alpha_, v_beta).custo)
         alpha_ = max(alpha_, v)
 
-        if(alpha_ > v and nodos_filhos[-1].profundidade == 1):
+        if(alpha_ > v and nodo.profundidade == 0):
             nodos_filhos[-1].posicao = pos
 
         if(alpha_ >= beta_):
@@ -91,7 +91,7 @@ def valor_min(nodo, color, minha_cor, alpha_, beta_):
         v = min(v, valor_max(nodos_filhos[-1], prox_cor, minha_cor, v_alpha, beta_).custo)
         beta_ = min(beta_, v)
 
-        if(beta_ < v and nodos_filhos[-1].profundidade == 1):
+        if(beta_ < v and nodo.profundidade == 0):
             nodos_filhos[-1].posicao = pos
 
         if(beta_ <= alpha_):
