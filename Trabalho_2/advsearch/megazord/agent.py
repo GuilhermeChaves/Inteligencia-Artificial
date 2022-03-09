@@ -28,15 +28,14 @@ class Nodo:
 
 
 def avalia(nodo, minha_cor):
-    escolhe_avaliacao = random.randint(0, 1)
-
-    if escolhe_avaliacao == 1:
-        avalia_matrix(nodo)
+    num_jogadas = len(nodo.estado.legal_moves(minha_cor))
+    if(num_jogadas == 0):
+        nodo.custo = 50
     else:
-        num_jogadas = len(nodo.estado.legal_moves(minha_cor))
-
-        if(num_jogadas == 0):
-            nodo.custo = 50
+        escolhe_avaliacao = random.randint(0, 10)
+        # alterar quando tiver outras avaliações
+        if escolhe_avaliacao <= 10:
+            avalia_matrix(nodo)
         else:
             nodo.custo = num_jogadas
 
