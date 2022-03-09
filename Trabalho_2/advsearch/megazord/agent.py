@@ -74,24 +74,6 @@ def avalia_num_jogadas(nodo, minha_cor):
     return peso
 
 
-def avalia_num_jogadas_inimigas(nodo, minha_cor):
-    peso = 0
-    
-    if(minha_cor == 'B'):
-        cor_inimiga = 'W'
-    elif(minha_cor == 'W'):
-        cor_inimiga = 'B'
-
-    num_jogadas = len(nodo.estado.legal_moves(cor_inimiga))
-
-    if(num_jogadas <= 9):
-        peso = 100 - num_jogadas*10
-    else:
-        peso = 0
-
-    return peso
-
-
 
 def valor_max(nodo, color, minha_cor, alpha_, beta_):
     l_posicoes = (nodo.estado).legal_moves(color)
