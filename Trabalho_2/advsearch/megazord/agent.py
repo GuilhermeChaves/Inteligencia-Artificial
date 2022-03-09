@@ -10,14 +10,28 @@ import copy
 # do seu agente.
 
 class Nodo:
+
     MATRIZ_PESOS = [[100, -15, 15, 8, 8, 15, -15, 100],
-                    [-15, -30, 2, 2, 2, 2, -30, -15],
-                    [30, 1, 5, 4, 4, 5, 1, 30],
-                    [8, 2, 4, 2, 2, 4, 2, 8],
-                    [8, 2, 4, 2, 2, 4, 2, 8],
-                    [30, 1, 5, 4, 4, 5, 1, 30],
-                    [-15, -30, 2, 2, 2, 2, -30, -15],
+                    [-15, -30, -2, -2, -2, -2, -30, -15],
+                    [30, -2, 10, 4, 4, 10, -2, 30],
+                    [8, -2, 4, 2, 2, 4, -2, 8],
+                    [8, -2, 4, 2, 2, 4, -2, 8],
+                    [30, -2, 10, 4, 4, 10, -2, 30],
+                    [-15, -30, -2, -2, -2, -2, -30, -15],
                     [100, -15, 15, 8, 8, 15, -15, 100]]
+    
+    
+    '''
+    MATRIZ_PESOS = [[100, 0, 50, 30, 30, 50, 0, 100],
+                    [0, 0, 0, 0, 0, 0, 0, 0],
+                    [50, 0, 20, 10, 10, 20, 0, 50],
+                    [30, 0, 10, 5, 5, 10, 0, 30],
+                    [30, 0, 10, 5, 5, 10, 0, 30],
+                    [50, 0, 20, 10, 10, 20, 0, 50],
+                    [0, 0, 0, 0, 0, 0, 0, 0],
+                    [100, 0, 50, 30, 30, 50, 0, 100]]
+    '''                
+    
 
     def __init__(self, estado, pai, profundidade, posicao, custo):
         self.estado = estado
@@ -28,29 +42,61 @@ class Nodo:
 
 
 def avalia(nodo, minha_cor):
-    num_jogadas = len(nodo.estado.legal_moves(minha_cor))
-    if(num_jogadas == 0):
-        nodo.custo = 50
-    else:
-        escolhe_avaliacao = random.randint(0, 10)
-        # alterar quando tiver outras avaliações
-        if escolhe_avaliacao <= 10:
-            avalia_matrix(nodo)
-        else:
-            nodo.custo = num_jogadas
+    nodo.custo = avalia_num_jogadas(nodo, minha_cor) + avalia_matrix(nodo);
 
     return nodo
+
+
 
 def avalia_matrix(nodo):
     x, y = nodo.posicao
-    nodo.custo = Nodo.MATRIZ_PESOS[x][y]
+    peso = Nodo.MATRIZ_PESOS[y][x]
 
-    return nodo
+    return peso
+
+
+
+def avalia_num_jogadas(nodo, minha_cor):
+    peso = 0
+    
+    if(minha_cor == 'B'):
+        cor_inimiga = 'W'
+    elif(minha_cor == 'W'):
+        cor_inimiga = 'B'
+
+    num_jogadas = len(nodo.estado.legal_moves(minha_cor))
+
+    if(num_jogadas <= 9):
+        peso = peso + num_jogadas*10  #100 - num_jogadas*10
+    else:
+        peso = 100
+
+    return peso
+
+
+def avalia_num_jogadas_inimigas(nodo, minha_cor):
+    peso = 0
+    
+    if(minha_cor == 'B'):
+        cor_inimiga = 'W'
+    elif(minha_cor == 'W'):
+        cor_inimiga = 'B'
+
+    num_jogadas = len(nodo.estado.legal_moves(cor_inimiga))
+
+    if(num_jogadas <= 9):
+        peso = 100 - num_jogadas*10
+    else:
+        peso = 0
+
+    return peso
+
+
 
 def valor_max(nodo, color, minha_cor, alpha_, beta_):
     l_posicoes = (nodo.estado).legal_moves(color)
 
-    if(nodo.profundidade == 5 or len(l_posicoes) == 0):
+    if(nodo.profundidade == 4 or len(l_posicoes) == 0):
         return avalia(nodo, minha_cor)
 
     v_beta = copy.deepcopy(beta_)
@@ -83,7 +129,7 @@ def valor_max(nodo, color, minha_cor, alpha_, beta_):
 def valor_min(nodo, color, minha_cor, alpha_, beta_):
     l_posicoes = (nodo.estado).legal_moves(color)
 
-    if(nodo.profundidade == 5 or len(l_posicoes) == 0):
+    if(nodo.profundidade == 4 or len(l_posicoes) == 0):
         return avalia(nodo, minha_cor)
 
     v_alpha = copy.deepcopy(alpha_)
