@@ -10,6 +10,15 @@ import copy
 # do seu agente.
 
 class Nodo:
+    MATRIZ_PESOS = [[100, -15, 15, 8, 8, 15, -15, 100],
+                    [-15, -30, 2, 2, 2, 2, -30, -15],
+                    [30, 1, 5, 4, 4, 5, 1, 30],
+                    [8, 2, 4, 2, 2, 4, 2, 8],
+                    [8, 2, 4, 2, 2, 4, 2, 8],
+                    [30, 1, 5, 4, 4, 5, 1, 30],
+                    [-15, -30, 2, 2, 2, 2, -30, -15],
+                    [100, -15, 15, 8, 8, 15, -15, 100]]
+
     def __init__(self, estado, pai, profundidade, posicao, custo):
         self.estado = estado
         self.pai = pai
@@ -18,9 +27,7 @@ class Nodo:
         self.custo = custo
 
 
-
 def avalia(nodo, minha_cor):
-    
     num_jogadas = len(nodo.estado.legal_moves(minha_cor))
 
     if(num_jogadas == 0):
@@ -30,13 +37,15 @@ def avalia(nodo, minha_cor):
 
     return nodo
 
+def avalia_matrix(nodo):
+    x, y = nodo.posicao
+    nodo.custo = Nodo.MATRIZ_PESOS[x][y]
 
-
+    return nodo
 
 def valor_max(nodo, color, minha_cor, alpha_, beta_):
-
     l_posicoes = (nodo.estado).legal_moves(color)
-    
+
     if(nodo.profundidade == 5 or len(l_posicoes) == 0):
         return avalia(nodo, minha_cor)
 
@@ -52,7 +61,7 @@ def valor_max(nodo, color, minha_cor, alpha_, beta_):
 
     for pos in l_posicoes:
         estado = copy.deepcopy(nodo.estado)
-        estado.process_move(pos, color)       
+        estado.process_move(pos, color)
         nodos_filhos.append(Nodo(estado, nodo, nodo.profundidade+1, pos,  0))
         v = max(v, valor_min(nodos_filhos[-1], prox_cor, minha_cor, alpha_, v_beta).custo)
         alpha_ = max(alpha_, v)
@@ -61,16 +70,15 @@ def valor_max(nodo, color, minha_cor, alpha_, beta_):
             nodos_filhos[-1].posicao = pos
 
         if(alpha_ >= beta_):
-            break 
-  
-    return nodos_filhos[-1]   
+            break
+
+    return nodos_filhos[-1]
 
 
 
 def valor_min(nodo, color, minha_cor, alpha_, beta_):
-
     l_posicoes = (nodo.estado).legal_moves(color)
-    
+
     if(nodo.profundidade == 5 or len(l_posicoes) == 0):
         return avalia(nodo, minha_cor)
 
@@ -86,7 +94,7 @@ def valor_min(nodo, color, minha_cor, alpha_, beta_):
 
     for pos in l_posicoes:
         estado = copy.deepcopy(nodo.estado)
-        estado.process_move(pos, color)       
+        estado.process_move(pos, color)
         nodos_filhos.append(Nodo(estado, nodo, nodo.profundidade+1, pos,  0))
         v = min(v, valor_max(nodos_filhos[-1], prox_cor, minha_cor, v_alpha, beta_).custo)
         beta_ = min(beta_, v)
@@ -95,8 +103,8 @@ def valor_min(nodo, color, minha_cor, alpha_, beta_):
             nodos_filhos[-1].posicao = pos
 
         if(beta_ <= alpha_):
-            break 
-        
+            break
+
     return nodos_filhos[-1]
 
 
@@ -118,4 +126,3 @@ def make_move(the_board, color):
     #print(l_legal_move)
     #return(-1,-1)
     return nodo.posicao
-
