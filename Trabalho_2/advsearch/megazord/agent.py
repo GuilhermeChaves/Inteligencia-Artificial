@@ -1,6 +1,4 @@
-import random
 import math
-import sys
 import copy
 
 # Voce pode criar funcoes auxiliares neste arquivo
@@ -8,6 +6,8 @@ import copy
 #
 # Nao esqueca de renomear 'your_agent' com o nome
 # do seu agente.
+
+MAX_PROFUNDIDADE = 4
 
 class Nodo:
 
@@ -19,19 +19,6 @@ class Nodo:
                     [30, -2, 10, 4, 4, 10, -2, 30],
                     [-15, -30, -2, -2, -2, -2, -30, -15],
                     [100, -15, 15, 8, 8, 15, -15, 100]]
-    
-    
-    '''
-    MATRIZ_PESOS = [[100, 0, 50, 30, 30, 50, 0, 100],
-                    [0, 0, 0, 0, 0, 0, 0, 0],
-                    [50, 0, 20, 10, 10, 20, 0, 50],
-                    [30, 0, 10, 5, 5, 10, 0, 30],
-                    [30, 0, 10, 5, 5, 10, 0, 30],
-                    [50, 0, 20, 10, 10, 20, 0, 50],
-                    [0, 0, 0, 0, 0, 0, 0, 0],
-                    [100, 0, 50, 30, 30, 50, 0, 100]]
-    '''                
-    
 
     def __init__(self, estado, pai, profundidade, posicao, custo):
         self.estado = estado
@@ -42,9 +29,14 @@ class Nodo:
 
 
 def avalia(nodo, minha_cor):
-    nodo.custo = avalia_num_jogadas(nodo, minha_cor) + avalia_matrix(nodo);
+    novo_custo = 0
 
-    return nodo
+    if(avalia_matrix(nodo) == 100):
+        novo_custo = 200
+    else:
+        novo_custo = avalia_num_jogadas(nodo, minha_cor) + avalia_matrix(nodo)
+
+    return novo_custo
 
 
 
@@ -59,11 +51,6 @@ def avalia_matrix(nodo):
 def avalia_num_jogadas(nodo, minha_cor):
     peso = 0
     
-    if(minha_cor == 'B'):
-        cor_inimiga = 'W'
-    elif(minha_cor == 'W'):
-        cor_inimiga = 'B'
-
     num_jogadas = len(nodo.estado.legal_moves(minha_cor))
 
     if(num_jogadas <= 9):
@@ -78,8 +65,9 @@ def avalia_num_jogadas(nodo, minha_cor):
 def valor_max(nodo, color, minha_cor, alpha_, beta_):
     l_posicoes = (nodo.estado).legal_moves(color)
 
-    if(nodo.profundidade == 4 or len(l_posicoes) == 0):
-        return avalia(nodo, minha_cor)
+    if(nodo.profundidade == MAX_PROFUNDIDADE or len(l_posicoes) == 0):
+        nodo.custo = avalia(nodo, minha_cor)
+        return nodo
 
     v_beta = copy.deepcopy(beta_)
     v = -math.inf
@@ -112,7 +100,8 @@ def valor_min(nodo, color, minha_cor, alpha_, beta_):
     l_posicoes = (nodo.estado).legal_moves(color)
 
     if(nodo.profundidade == 4 or len(l_posicoes) == 0):
-        return avalia(nodo, minha_cor)
+        nodo.custo = avalia(nodo, minha_cor)
+        return nodo
 
     v_alpha = copy.deepcopy(alpha_)
     v = math.inf
@@ -148,13 +137,7 @@ def make_move(the_board, color):
     :param color: a character indicating the color to make the move ('B' or 'W')
     :return: (int, int) tuple with x, y indexes of the move (remember: 0 is the first row/column)
     """
-    # o codigo abaixo apenas retorna um movimento aleatorio valido para
-    # a primeira jogada com as pretas.
-    # Remova-o e coloque a sua implementacao da poda alpha-beta
-    #return random.choice([(2, 3), (4, 5), (5, 4), (3, 2)])
     raiz = Nodo(the_board, None, 0, (-1, -1), 0)
     nodo = valor_max(raiz, color, color, -math.inf, math.inf)
-    #l_legal_move = (raiz.estado).legal_moves(color)
-    #print(l_legal_move)
-    #return(-1,-1)
+    
     return nodo.posicao
