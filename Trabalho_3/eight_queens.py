@@ -1,3 +1,20 @@
+BOARD_SIZE = 8
+
+def attack(attacker, attacked, index_attacker, index_attacked):
+    upper_diagonal = attacker + (index_attacked - index_attacker)
+    lower_diagonal = attacker - (index_attacked - index_attacker)
+
+    if(attacker == attacked):
+        return True
+    elif (not(upper_diagonal > BOARD_SIZE)):
+        if(attacked == (attacker + (index_attacked - index_attacker))):
+            return True
+    elif (not(lower_diagonal < 0)):
+        if(attacked == (attacker - (index_attacked - index_attacker))):
+            return True
+    
+    return False
+
 def evaluate(individual):
     """
     Recebe um indivíduo (lista de inteiros) e retorna o número de ataques
@@ -7,8 +24,17 @@ def evaluate(individual):
     :param individual:list
     :return:int numero de ataques entre rainhas no individuo recebido
     """
-    raise NotImplementedError  # substituir pelo seu codigo
+    attacks = 0
 
+    for index, queen in enumerate(individual):
+        i=index+1
+        
+        while(i < BOARD_SIZE):
+            if(attack(queen, individual[i], index, i)):
+                attacks+=1
+            i+=1
+
+    return attacks
 
 def tournament(participants):
     """
