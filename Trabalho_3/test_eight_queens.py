@@ -9,7 +9,7 @@ class TestEightQueens(unittest.TestCase):
         Teste basico com o exemplo do enunciado
         :return:
         """
-        self.assertEqual(10, eight_queens.evaluate([2,2,4,8,1,6,3,4]))
+        self.assertEqual(9, eight_queens.evaluate([2,2,4,8,1,6,3,4]))
 
     def test_tournament(self):
         """

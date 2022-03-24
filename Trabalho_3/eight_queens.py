@@ -1,4 +1,8 @@
+from copy import copy
+from random import random, randrange
+
 BOARD_SIZE = 8
+MAX_ATTACKS = 1000
 
 def attack(attacker, attacked, index_attacker, index_attacked):
     upper_diagonal = attacker + (index_attacked - index_attacker)
@@ -43,7 +47,14 @@ def tournament(participants):
     :param participants:list - lista de individuos
     :return:list melhor individuo da lista recebida
     """
-    raise NotImplementedError  # substituir pelo seu codigo
+    best_score = MAX_ATTACKS
+    winner_index = 0
+
+    for index, participant in enumerate(participants):
+        if(evaluate(participant) < best_score):
+            winner_index = index
+
+    return participants[winner_index]
 
 
 def crossover(parent1, parent2, index):
@@ -60,7 +71,11 @@ def crossover(parent1, parent2, index):
     :param index:int
     :return:list,list
     """
-    raise NotImplementedError  # substituir pelo seu codigo
+    temp_list = parent2
+    parent2 = parent2[0 : index] + parent1[index : BOARD_SIZE]
+    parent1 = parent1[0 : index] + temp_list[index : BOARD_SIZE]
+
+    return parent1, parent2
 
 
 def mutate(individual, m):
@@ -69,11 +84,16 @@ def mutate(individual, m):
     Caso random() < m, sorteia uma posição aleatória do indivíduo e
     coloca nela um número aleatório entre 1 e 8 (inclusive).
     :param individual:list
-    :param m:int - probabilidade de mutacao
+    :param m:float - probabilidade de mutacao
     :return:list - individuo apos mutacao (ou intacto, caso a prob. de mutacao nao seja satisfeita)
     """
-    raise NotImplementedError  # substituir pelo seu codigo
+    new_individual = copy(individual)
 
+    if (random() < m):
+        while(new_individual == individual):
+            new_individual[randrange(8)] = randrange(1,9)
+
+    return new_individual
 
 def run_ga(g, n, k, m, e):
     """
