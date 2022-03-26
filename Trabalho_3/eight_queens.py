@@ -1,5 +1,6 @@
 from copy import copy
-from random import random, randrange
+from random import random, randrange, sample
+import matplotlib.pyplot as plt
 
 BOARD_SIZE = 8
 MAX_ATTACKS = 1000
@@ -16,7 +17,7 @@ def attack(attacker, attacked, index_attacker, index_attacked):
     elif (not(lower_diagonal < 0)):
         if(attacked == (attacker - (index_attacked - index_attacker))):
             return True
-    
+
     return False
 
 def evaluate(individual):
@@ -32,7 +33,7 @@ def evaluate(individual):
 
     for index, queen in enumerate(individual):
         i=index+1
-        
+
         while(i < BOARD_SIZE):
             if(attack(queen, individual[i], index, i)):
                 attacks+=1
@@ -95,6 +96,41 @@ def mutate(individual, m):
 
     return new_individual
 
+def random_chromosome():
+    """Gera um cromossomo aleatório."""
+    chromosome = []
+    possible_values = set((range(1, 8)))
+
+    for _ in range(8):
+        gene = sample(possible_values, 1)[0]
+        chromosome.append(gene)
+
+    return chromosome
+
+
+def random_population(population_size):
+    """Gera populações aleatórias de tamanho `population_size`."""
+    population = []
+
+    for _ in range(population_size):
+        found = False
+
+        while not found:
+            candidate = random_chromosome()
+            if not chromosome_exists(candidate, population):
+                population.append(candidate)
+                found = True
+
+    return population
+
+def chromosome_exists(chromosome, population):
+    """Verifica se um dado cromossomo já existe em uma dada população."""
+    for existing_chromosome in population:
+        if chromosome == existing_chromosome:
+            return True
+    return False
+
+all_generations = []
 def run_ga(g, n, k, m, e):
     """
     Executa o algoritmo genético e retorna o indivíduo com o menor número de ataques entre rainhas
@@ -105,4 +141,43 @@ def run_ga(g, n, k, m, e):
     :param e:bool - se vai haver elitismo
     :return:list - melhor individuo encontrado
     """
-    raise NotImplementedError  # substituir pelo seu codigo
+    # Inicializa a população
+    current_population = random_population(n)
+    # print(f"População inicial: {current_population}")
+
+    # Roda o algoritmo genético
+    for generation in range(g):
+        # Aplicação de elitismo
+        if e:
+            new_population = [tournament(current_population)]
+        else:
+            new_population = []
+
+        while len(new_population) < n:
+            # Seleção de indivíduos
+            sample_population_1 = sample(current_population, k)
+            sample_population_2 = sample(current_population, k)
+
+            # Torneio
+            p1, p2 = tournament(sample_population_1), tournament(sample_population_2)
+
+            p1x, p2x = crossover(p1, p2, randrange(BOARD_SIZE))
+            p1m = mutate(p1x, m)
+            p2m = mutate(p2x, m)
+
+            if not chromosome_exists(p1m, new_population):
+                new_population.append(p1m)
+            if not chromosome_exists(p2m, new_population):
+                new_population.append(p2m)
+
+        current_population = new_population
+        best = tournament(current_population)
+        all_generations.append(evaluate(best))
+
+        # print(f"Generation {generation}: {evaluate(best)}")
+
+run_ga(400, 200, 4, 0.1, False)
+# plot all generations
+plt.plot(all_generations)
+plt.show()
+
