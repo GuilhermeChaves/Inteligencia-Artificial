@@ -1,9 +1,10 @@
 from copy import copy
 from random import random, randrange, sample
 import matplotlib.pyplot as plt
+import numpy as np
 
 BOARD_SIZE = 8
-MAX_ATTACKS = 1000
+MAX_ATTACKS = 10000
 
 def attack(attacker, attacked, index_attacker, index_attacked):
     upper_diagonal = attacker + (index_attacked - index_attacker)
@@ -53,6 +54,7 @@ def tournament(participants):
 
     for index, participant in enumerate(participants):
         if(evaluate(participant) < best_score):
+            best_score = evaluate(participant)
             winner_index = index
 
     return participants[winner_index]
@@ -92,16 +94,16 @@ def mutate(individual, m):
 
     if (random() < m):
         while(new_individual == individual):
-            new_individual[randrange(8)] = randrange(1,9)
+            new_individual[randrange(BOARD_SIZE)] = randrange(1,BOARD_SIZE+1)
 
     return new_individual
 
 def random_chromosome():
     """Gera um cromossomo aleatório."""
     chromosome = []
-    possible_values = set((range(1, 8)))
+    possible_values = set((range(1, BOARD_SIZE)))
 
-    for _ in range(8):
+    for _ in range(BOARD_SIZE):
         gene = sample(possible_values, 1)[0]
         chromosome.append(gene)
 
@@ -130,7 +132,22 @@ def chromosome_exists(chromosome, population):
             return True
     return False
 
-all_generations = []
+def statistics(population):
+    values = []
+
+    for individual in population:
+        score = evaluate(individual)
+        values.append(score)
+
+    avg = np.average(values)
+    worst = np.amax(values)
+
+    return avg, worst
+
+best_values = []
+average_values = []
+worst_values = []
+
 def run_ga(g, n, k, m, e):
     """
     Executa o algoritmo genético e retorna o indivíduo com o menor número de ataques entre rainhas
@@ -170,14 +187,32 @@ def run_ga(g, n, k, m, e):
             if not chromosome_exists(p2m, new_population):
                 new_population.append(p2m)
 
-        current_population = new_population
+        current_population = copy(new_population)
         best = tournament(current_population)
-        all_generations.append(evaluate(best))
+        best_values.append(evaluate(best))
+        avg, worst = statistics(current_population)
+        average_values.append(avg)
+        worst_values.append(worst)
+
+        if evaluate(best) == 0:
+            return generation
 
         # print(f"Generation {generation}: {evaluate(best)}")
+    
+    return g
 
-run_ga(400, 200, 4, 0.1, False)
-# plot all generations
-plt.plot(all_generations)
-plt.show()
+def average_generations(runs):    
+    average = 0
+
+    count = 0
+    sum = 0
+    generation = 0
+
+    for _ in range(1,runs):
+        generation = run_ga(60, 20, 4, 0.8, True)
+        count = count + 1
+        sum = sum + generation
+        average = sum / count
+    
+    return average
 
