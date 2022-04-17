@@ -12,7 +12,8 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-import mdp, util
+import mdp, util, copy
+from operator import itemgetter 
 from learningAgents import ValueEstimationAgent
 
 class ValueIterationAgent(ValueEstimationAgent):
@@ -43,7 +44,40 @@ class ValueIterationAgent(ValueEstimationAgent):
         self.values = util.Counter()  # A Counter is a dict with default 0
 
         # Write value iteration code here
-        "*** YOUR CODE HERE ***"
+        l_estados = mdp.getStates()
+        recompensa = 0.0
+        sum_prob = 0.0
+        l_values = copy.deepcopy(self.values)
+        total_prob = 0.0
+        
+        list_sum_prob = list()
+        
+        for i in range(iterations):
+            for estado in l_estados:
+                if(mdp.isTerminal(estado)):
+                    self.values[estado] = 0.0
+                    continue
+
+                l_acoes = mdp.getPossibleActions(estado)
+                for acao in l_acoes:
+                    l_estado_prob = mdp.getTransitionStatesAndProbs(estado, acao)
+                    sum_prob = 0.0
+                    
+                    for prox_estado, prox_prob in l_estado_prob:
+                        sum_prob += prox_prob * l_values[prox_estado]
+
+                    proximo_estado =  copy.deepcopy(max(l_estado_prob, key=itemgetter(1))[0])
+                    total_prob = copy.deepcopy(sum_prob)
+                    list_sum_prob.append((total_prob, proximo_estado, acao))
+                
+                valor_maximo = copy.deepcopy(max(list_sum_prob, key=itemgetter(0))[0])
+                recompensa = mdp.getReward(estado, max(list_sum_prob, key=itemgetter(0))[2], max(list_sum_prob, key=itemgetter(0))[1])
+                self.values[estado] = recompensa + self.discount * valor_maximo
+                list_sum_prob.clear()
+
+            l_values = copy.deepcopy(self.values)
+
+
 
 
     def getValue(self, state):
@@ -57,8 +91,19 @@ class ValueIterationAgent(ValueEstimationAgent):
           Compute the Q-value of action in state from the
           value function stored in self.values.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        q = 0.0
+
+        l_estado_prob = self.mdp.getTransitionStatesAndProbs(state, action)
+
+        for prox_estado, prox_prob in l_estado_prob:
+            recompensa = self.mdp.getReward(state, action, prox_estado)
+            q += recompensa + self.discount * self.values[prox_estado] * prox_prob 
+
+
+        return q
+
+
+        #util.raiseNotDefined()
 
     def computeActionFromValues(self, state):
         """
@@ -69,8 +114,18 @@ class ValueIterationAgent(ValueEstimationAgent):
           there are no legal actions, which is the case at the
           terminal state, you should return None.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        l_acoes = self.mdp.getPossibleActions(state)
+        l_valor_acoes = list()
+
+        for acao in l_acoes:
+            q = self.computeQValueFromValues(state, acao)
+            l_valor_acoes.append((acao, q))
+
+        if(len(l_valor_acoes) == 0):
+            return None
+
+        return max(l_valor_acoes, key=itemgetter(1))[0]
+
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
